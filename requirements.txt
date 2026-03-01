@@ -1,0 +1,4 @@
+groq>=0.13.0
+feedparser>=6.0.11
+line-bot-sdk>=3.11.0
+python-dateutil>=2.9.0
