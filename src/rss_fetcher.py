@@ -55,9 +55,12 @@ def _get_entry_url(entry: Any) -> str:
     return getattr(entry, "link", "") or getattr(entry, "id", "")
 
 
-def fetch_articles() -> list[dict]:
+def fetch_articles(category: Optional[str] = None) -> list[dict]:
     """
     從所有啟用的 RSS 來源抓取近 24 小時的新聞。
+
+    Args:
+        category: 若指定則只抓取該分類的來源（如 "ai" 或 "security"），None 表示全部
 
     Returns:
         list of dict with keys: title, url, summary, source, published_at
@@ -68,10 +71,6 @@ def fetch_articles() -> list[dict]:
     with open(RSS_SOURCES_PATH, encoding="utf-8") as f:
         sources = json.load(f)
 
-    cutoff_time = datetime.now(tz=timezone.utc).replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-    # 實際使用 NEWS_HOURS_LIMIT 計算截止時間
     from datetime import timedelta
     cutoff_time = datetime.now(tz=timezone.utc) - timedelta(hours=NEWS_HOURS_LIMIT)
 
@@ -80,6 +79,9 @@ def fetch_articles() -> list[dict]:
 
     for source in sources:
         if not source.get("enabled", True):
+            continue
+
+        if category and source.get("category") != category:
             continue
 
         source_name = source.get("name", "Unknown")
