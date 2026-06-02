@@ -14,6 +14,10 @@ LINE_USER_ID = os.environ.get("LINE_USER_ID", "")
 # Groq API 設定
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
+# my-world API 設定
+MY_WORLD_API_URL = os.environ.get("MY_WORLD_API_URL", "")
+MY_WORLD_NEWS_API_KEY = os.environ.get("MY_WORLD_NEWS_API_KEY", "")
+
 # Groq 模型設定
 GROQ_MODEL = "llama-3.3-70b-versatile"
 

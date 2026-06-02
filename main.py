@@ -19,6 +19,7 @@ from config import validate_config
 from rss_fetcher import fetch_articles
 from news_processor import process_news
 from line_sender import send_message
+from my_world_sender import push_news
 
 logging.basicConfig(
     level=logging.INFO,
@@ -62,9 +63,14 @@ def main() -> None:
     security_summary = process_news(security_articles, date_str, category="security")
 
     # 6. LINE Push Message 發送（兩則分開）
-    logger.info("步驟 6/6：透過 LINE 發送訊息")
+    logger.info("步驟 6/7：透過 LINE 發送訊息")
     send_message(ai_summary)
     send_message(security_summary)
+
+    # 7. 推送至 my-world 存檔
+    logger.info("步驟 7/7：推送至 my-world")
+    push_news(ai_summary, date_str, category="ai")
+    push_news(security_summary, date_str, category="security")
 
     logger.info("=== 每日新聞彙整完成 ===")
 
