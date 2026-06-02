@@ -38,6 +38,7 @@ def push_news(content: str, date_str: str, category: str) -> None:
         headers={
             "Content-Type": "application/json",
             "x-api-key": MY_WORLD_NEWS_API_KEY,
+            "User-Agent": "ai-news-linebot/1.0",
         },
         method="POST",
     )
