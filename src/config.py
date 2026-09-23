@@ -19,7 +19,9 @@ MY_WORLD_API_URL = os.environ.get("MY_WORLD_API_URL", "")
 MY_WORLD_NEWS_API_KEY = os.environ.get("MY_WORLD_NEWS_API_KEY", "")
 
 # Groq 模型設定
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
+GROQ_REASONING_EFFORT = "low"  # 摘要任務不需深度推理；推理 token 會計入 max_tokens
+GROQ_MAX_TOKENS = 4096         # 含推理 token，2048 實測會截斷資安摘要
 
 # RSS 來源設定檔路徑
 RSS_SOURCES_PATH = PROJECT_ROOT / "rss_sources.json"

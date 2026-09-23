@@ -1,13 +1,19 @@
 """
 新聞摘要處理模組
-- 使用 Groq API（Llama 3.3 70B）整理、翻譯、摘要
+- 使用 Groq API（GPT-OSS 120B）整理、翻譯、摘要
 - 輸出固定格式的繁體中文新聞彙整
 """
 import logging
 
 from groq import Groq
 
-from config import GROQ_API_KEY, GROQ_MODEL, MAX_ARTICLES_FOR_SUMMARY
+from config import (
+    GROQ_API_KEY,
+    GROQ_MAX_TOKENS,
+    GROQ_MODEL,
+    GROQ_REASONING_EFFORT,
+    MAX_ARTICLES_FOR_SUMMARY,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +41,10 @@ USER_PROMPT_TEMPLATE_AI = """\
 📰 今日精選新聞（共 N 則）
 ━━━━━━━━━━━━━━━
 
-1️⃣ 【標題】（繁體中文翻譯標題）
+1️⃣ 【繁體中文翻譯標題】
 📝 （50-80 字的繁體中文摘要，說明這則新聞的重點內容）
 
-2️⃣ 【標題】
+2️⃣ 【繁體中文翻譯標題】
 📝 （摘要）
 
 （依此類推，選取 5-8 則最重要的新聞）
@@ -72,10 +78,10 @@ USER_PROMPT_TEMPLATE_SECURITY = """\
 🛡️ 今日精選資安新聞（共 N 則）
 ━━━━━━━━━━━━━━━
 
-1️⃣ 【標題】（繁體中文翻譯標題）
+1️⃣ 【繁體中文翻譯標題】
 📝 （50-80 字的繁體中文摘要，說明漏洞影響範圍、受影響版本及建議處置）
 
-2️⃣ 【標題】
+2️⃣ 【繁體中文翻譯標題】
 📝 （摘要）
 
 （依此類推，選取 5-8 則最重要的新聞）
@@ -143,11 +149,16 @@ def process_news(articles: list, date_str: str, category: str = "ai") -> str:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        max_tokens=2048,
+        max_tokens=GROQ_MAX_TOKENS,
         temperature=0.3,
+        reasoning_effort=GROQ_REASONING_EFFORT,
     )
 
-    result = response.choices[0].message.content.strip()
+    choice = response.choices[0]
+    if choice.finish_reason == "length":
+        logger.warning("Groq 輸出達 max_tokens 上限被截斷，摘要可能不完整")
+
+    result = (choice.message.content or "").strip()
     logger.info(
         "Groq API 完成，輸入 tokens：%d，輸出 tokens：%d",
         response.usage.prompt_tokens,
