@@ -60,7 +60,8 @@ def send_message(text: str) -> None:
         line_bot_api = MessagingApi(api_client)
 
         parts = _split_message(text)
-        logger.info("準備發送 %d 則訊息給 %s", len(parts), LINE_USER_ID)
+        # 公開 repo 的 Actions log 任何人都看得到，不印 user ID（不依賴 GitHub 的 secret 遮蔽）
+        logger.info("準備發送 %d 則訊息", len(parts))
 
         for i, part in enumerate(parts, 1):
             logger.info("發送第 %d/%d 則訊息（%d 字元）", i, len(parts), len(part))
